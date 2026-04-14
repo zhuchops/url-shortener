@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Rust server shortener
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rust-server-container
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: rust-server-container
+    spec:
+      containers:
+        - name: rust-server-container
+          image: 
+    

@@ -1,0 +1,24 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl set image deployment/rust-server-shortener rust-server-container=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --namespace=production --record
+    - kubectl rollout status deployment/rust-server-shortener --namespace=production
+  only:
+    - main
