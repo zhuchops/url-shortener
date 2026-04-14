@@ -1,4 +1,4 @@
-use axum::{Router, routing::{get, post}};
+use axum::{Router, http::StatusCode, routing::{get, post}};
 
 
 #[tokio::main]
@@ -15,6 +15,6 @@ async fn root() -> &'static str {
     return "Hello world"
 }
 
-async fn health() -> &'static str {
-    return "I'm OK"
+async fn health() -> StatusCode {
+    return StatusCode::OK
 }
