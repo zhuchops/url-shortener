@@ -1,0 +1,71 @@
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  image: docker:29.4
+  services:
+    - docker:29.4-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
+    - docker push $IMAGE_TAG
+    - docker push $IMAGE_LATEST
+  only:
+    - main
+
+test:
+  stage: test
+  image: rust:1.94.1-slim
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .cargo/registry
+      - target/
+    variables:
+      CARGO_HOME: "$CI_PROJECT_DIR/.cargo"
+  script:
+    - cargo test --all
+  only:
+    - main
+    - merge_requests
+
+deploy:
+  stage: deploy
+  image: alpine:3.23
+  before_script:
+    - apk add --no-cache openssh-client
+    - chmod 600 $SSH_PRIVATE_KEY
+    - mkdir -p ~/.ssh
+    - mkdir -p /tmp/k8s-deploy
+    - ssh-keyscan -H @VPS_HOST >> ~/.ssh/known_hosts
+  script:
+    - scp -i $SSH_PRIVATE_KEY -r ./k8s $VPS_USER@$VPS_HOST:/tmp/k8s-deploy/
+    - |
+      ssh -i $SSH_PRIVATE_KEY $VPS_USER@$VPS_HOST "
+        kubectl apply -f /tmp/deploy/k8s
+        kubectl set image deployment/url-shortener \
+          url-shortener=$IMAGE_TAG \
+          -n url-shortener
+        kubectl rollout status deployment/url-shortener \
+          -n url-shortener \
+          --timeout=120
+
+        rm -rf /tmp/k8s-deploy
+      "
+  environment:
+    name: production
+    url: http://my.shortener.com
+  only:
+    - main
+  needs:
+    - build
+    - test

@@ -8,7 +8,7 @@ metadata:
 
 spec:
   rules:
-    - host: my.urlshortener.com
+    - host: my.shortener.com
       http:
         paths:
           - path: /
