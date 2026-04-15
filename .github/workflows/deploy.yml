@@ -54,7 +54,7 @@ jobs:
     needs: build
     environment:
       name: production
-      url: http://my.shortner.com
+      url: http://my.shortener.com
     steps:
       - uses: actions/checkout@v6
 
@@ -79,5 +79,5 @@ jobs:
               url-shortener=${{ env.IMAGE_TAG }} \
               -n url-shortener
             kubectl rollout status deployment/url-shortener \
-              -n url-shortener
+              -n url-shortener \
               --timeout=120
