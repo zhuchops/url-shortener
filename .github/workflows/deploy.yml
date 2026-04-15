@@ -80,4 +80,4 @@ jobs:
               -n url-shortener
             kubectl rollout status deployment/url-shortener \
               -n url-shortener \
-              --timeout=120
+              --timeout=120s
