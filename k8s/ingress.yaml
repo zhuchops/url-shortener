@@ -8,8 +8,7 @@ metadata:
 
 spec:
   rules:
-    - host: my.shortener.com
-      http:
+    - http:
         paths:
           - path: /
             backend:
