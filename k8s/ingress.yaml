@@ -15,5 +15,5 @@ spec:
               service:
                 name: url-shortener
                 port:
-                  number: 8080
+                  number: 8050
             pathType: Prefix
