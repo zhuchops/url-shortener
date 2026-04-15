@@ -74,7 +74,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            kubectl apply -f /tmp/k8s-deploy/ || true
+            kubectl apply -f /tmp/k8s-deploy/* || true
             kubectl set image deployment/url-shortener \
               url-shortener=${{ env.IMAGE_TAG }} \
               -n url-shortener
