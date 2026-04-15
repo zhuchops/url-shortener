@@ -21,7 +21,9 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: run tests
-        run: cargo test --all
+        run: |
+          cd rust-server
+          cargo test --all
 
   build:
     runs-on: ubuntu-latest
