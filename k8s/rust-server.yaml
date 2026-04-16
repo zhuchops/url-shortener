@@ -54,8 +54,9 @@ metadata:
 spec:
   selector:
     app: url-shortener
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 80
       targetPort: 3000
+      nodePort: 30080
       protocol: TCP
