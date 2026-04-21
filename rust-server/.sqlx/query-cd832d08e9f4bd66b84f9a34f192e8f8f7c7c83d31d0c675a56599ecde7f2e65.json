@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select full_url from urls where url_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "full_url",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "cd832d08e9f4bd66b84f9a34f192e8f8f7c7c83d31d0c675a56599ecde7f2e65"
+}

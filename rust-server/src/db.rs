@@ -32,14 +32,22 @@ impl Db {
         )
         .execute(&self.pool)
         .await
-        .unwrap();
+        .map_err(|_| DbError::AlreadyExists)?;
 
         let url = host + "/" + &url_id;
         Ok(format!("{}", url))
     }
 
-    pub async fn get_link(&self, url: String) -> Result<String, DbError> {
-        Ok(format!("real url of {}", url))
+    pub async fn get_link(&self, url_id: String) -> Result<String, DbError> {
+        let row = sqlx::query!("select full_url from urls where url_id = $1", url_id)
+            .fetch_one(&self.pool)
+            .await
+            .unwrap();
+        if let Some(full_url) = row.full_url {
+            Ok(format!("{}", full_url))
+        } else {
+            Err(DbError::NoSuchLink)
+        }
     }
 
     async fn generate_unique_url_id(&self) -> String {
