@@ -1,3 +1,5 @@
+use chrono::{self, NaiveDate, Utc};
+use rand::RngExt;
 use sqlx::{PgConnection, PgPool};
 
 #[derive(Clone)]
@@ -19,12 +21,56 @@ impl Db {
         Ok(Self { pool, db_url })
     }
 
-    pub async fn short_link(&self, url: String) -> Result<String, DbError> {
-        Ok(format!("shorted version of {}", url))
+    pub async fn short_link(&self, host: String, full_url: String) -> Result<String, DbError> {
+        let url_id = self.generate_unique_url_id().await;
+        let date = Utc::now();
+        sqlx::query!(
+            "insert into urls (url_id, full_url, date) values ($1, $2, $3)",
+            url_id,
+            full_url,
+            date.date_naive()
+        )
+        .execute(&self.pool)
+        .await
+        .unwrap();
+
+        let url = host + "/" + &url_id;
+        Ok(format!("{}", url))
     }
 
     pub async fn get_link(&self, url: String) -> Result<String, DbError> {
         Ok(format!("real url of {}", url))
+    }
+
+    async fn generate_unique_url_id(&self) -> String {
+        let mut url_id = Db::generate_url_id();
+        while !self.check_url_id(&url_id).await.unwrap() {
+            url_id = Db::generate_url_id();
+        }
+        url_id
+    }
+
+    fn generate_url_id() -> String {
+        const ALPHABET: &[u8] = b"0123456789abcdefghijklmnopqrstuvwxyz";
+        const LENGHT: i8 = 10;
+        let mut rng = rand::rng();
+        (0..LENGHT)
+            .map(|_| {
+                let idx = rng.random_range(0..ALPHABET.len());
+                ALPHABET[idx] as char
+            })
+            .collect()
+    }
+
+    async fn check_url_id(&self, url_id: &String) -> Result<bool, DbError> {
+        match sqlx::query!("select * from urls where url_id = $1", url_id)
+            .fetch_optional(&self.pool)
+            .await
+            .unwrap()
+        {
+            Some(_) => Ok(false),
+            None => Ok(true),
+        }
     }
 }
 

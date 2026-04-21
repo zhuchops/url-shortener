@@ -16,8 +16,8 @@ use crate::db::{Db, DbError};
 
 #[tokio::main]
 async fn main() {
-    let db_url = env::var("DB_URL").expect("DB_URL must be set");
-    let db = Db::new(db_url).await;
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let db = Db::new(db_url).await.unwrap();
     let app = Router::new()
         .route("/short", post(short))
         .route("/get/{id}", get(get_url))
@@ -43,8 +43,9 @@ struct PostUrl {
 }
 
 async fn short(Query(params): Query<PostUrl>, State(db): State<Db>) -> Result<String, StatusCode> {
-    let true_url = params.link;
-    let shorted_url_result = db.short_link(true_url);
+    let full_url = params.link;
+    let host = env::var("HOST_URL").expect("HOST_URL env var must be set.");
+    let shorted_url_result = db.short_link(host, full_url);
     match shorted_url_result.await {
         Ok(url) => Ok(url),
         Err(err) => match err {

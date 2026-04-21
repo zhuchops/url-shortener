@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
+chrono = "0.4.44"
+rand = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
 sqlx = { version = "0.8.6", features = ["chrono", "macros", "postgres", "runtime-tokio", "uuid"] }
 thiserror = "2.0.18"

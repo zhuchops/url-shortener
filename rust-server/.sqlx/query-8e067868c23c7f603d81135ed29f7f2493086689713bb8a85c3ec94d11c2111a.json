@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select * from urls where url_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "url_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "full_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "date",
+        "type_info": "Date"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "8e067868c23c7f603d81135ed29f7f2493086689713bb8a85c3ec94d11c2111a"
+}
