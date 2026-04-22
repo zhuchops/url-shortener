@@ -32,6 +32,8 @@ spec:
                   key: database-url
             - name: RUST_LOG
               value: info
+            - name: DB_HOST
+              value: http://144.31.112.219:30080
           resources:
             requests:
               cpu: "100m"
