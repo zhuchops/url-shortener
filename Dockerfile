@@ -10,6 +10,7 @@ RUN cargo build --release
 RUN rm -f target/release/deps/rust_server*
 
 COPY rust-server/src ./src
+COPY rust-server/migrations ./migrations
 
 RUN cargo build --release
 
