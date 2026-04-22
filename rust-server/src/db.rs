@@ -1,11 +1,11 @@
-use chrono::{self, NaiveDate, Utc};
+use chrono::{self, Utc};
 use rand::RngExt;
-use sqlx::{PgConnection, PgPool};
+use sqlx::PgPool;
+use url::Url;
 
 #[derive(Clone)]
 pub struct Db {
     pool: PgPool,
-    db_url: String,
 }
 
 impl Db {
@@ -18,10 +18,16 @@ impl Db {
             .run(&pool)
             .await
             .map_err(|err| DbError::MigrateError(err.to_string()))?;
-        Ok(Self { pool, db_url })
+        Ok(Self { pool })
     }
 
     pub async fn short_link(&self, host: String, full_url: String) -> Result<String, DbError> {
+        if !Url::parse(host.as_str()).is_ok() {
+            return Err(DbError::HostIsNotUrl);
+        }
+        if !Url::parse(full_url.as_str()).is_ok() {
+            return Err(DbError::UrlIsNotUrl);
+        }
         let url_id = self.generate_unique_url_id().await;
         let date = Utc::now();
         sqlx::query!(
@@ -92,4 +98,8 @@ pub enum DbError {
     NoSuchDatabase(String),
     #[error("Migration went wrong. check your sql files. Exact error - {0}")]
     MigrateError(String),
+    #[error("Provided host url is not a valid url.")]
+    HostIsNotUrl,
+    #[error("Provided url is not a valid url.")]
+    UrlIsNotUrl,
 }
