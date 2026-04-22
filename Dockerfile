@@ -2,7 +2,7 @@ FROM rust:1.94.1-slim AS builder
 
 WORKDIR /app
 
-COPY rust-server/.sqlx ./
+COPY rust-server/.sqlx ./.sqlx
 COPY rust-server/Cargo.toml rust-server/Cargo.lock ./
 
 RUN mkdir src && echo "fn main() {}" > src/main.rs
