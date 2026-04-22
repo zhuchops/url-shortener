@@ -26,6 +26,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: postgres-password
+                  name: url-shortener-secrets
           ports:
             - containerPort: 5432
           volumeMounts:
