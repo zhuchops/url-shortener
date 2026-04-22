@@ -61,7 +61,7 @@ jobs:
           script: |
             kubectl apply -f /tmp/k8s-deploy/* || true
             kubectl set image deployment/url-shortener \
-              url-shortener=${{ env.IMAGE_TAG }} \
+              url-shortener-container=${{ env.IMAGE_TAG }} \
               -n url-shortener
             kubectl rollout status deployment/url-shortener \
               -n url-shortener \
