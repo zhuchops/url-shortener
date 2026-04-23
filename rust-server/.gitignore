@@ -1,2 +1,3 @@
 target/
 .mise.toml
+k8s/secrets.yaml
