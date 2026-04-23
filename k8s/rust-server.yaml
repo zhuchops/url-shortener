@@ -32,7 +32,7 @@ spec:
                   key: database-url
             - name: RUST_LOG
               value: info
-            - name: DB_HOST
+            - name: HOST_URL
               value: http://144.31.112.219:30080
           resources:
             requests:
