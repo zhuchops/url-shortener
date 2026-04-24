@@ -21,7 +21,7 @@ impl Db {
         Ok(Self { pool })
     }
 
-    pub async fn short_link(&self, host: String, full_url: String) -> Result<String, DbError> {
+    pub async fn short_link(&self, host: &String, full_url: &String) -> Result<String, DbError> {
         if !Url::parse(host.as_str()).is_ok() {
             return Err(DbError::HostIsNotUrl);
         }
@@ -40,11 +40,11 @@ impl Db {
         .await
         .map_err(|_| DbError::AlreadyExists)?;
 
-        let url = host + "/" + &url_id;
+        let url = host.to_string() + "/" + &url_id;
         Ok(format!("{}", url))
     }
 
-    pub async fn get_link(&self, url_id: String) -> Result<String, DbError> {
+    pub async fn get_link(&self, url_id: &String) -> Result<String, DbError> {
         let row = sqlx::query!("select full_url from urls where url_id = $1", url_id)
             .fetch_one(&self.pool)
             .await

@@ -49,11 +49,14 @@ async fn short(
 ) -> Result<(StatusCode, String), StatusCode> {
     let full_url = params.link;
     let host = env::var("HOST_URL").expect("HOST_URL env var must be set.");
-    let shorted_url_result = db.short_link(host, full_url);
+    let shorted_url_result = db.short_link(&host, &full_url);
     match shorted_url_result.await {
         Ok(url) => Ok((StatusCode::CREATED, url)),
         Err(err) => match err {
-            DbError::AlreadyExists => Err(StatusCode::CONFLICT),
+            DbError::AlreadyExists => {
+                let url = db.get_link(&full_url).await.unwrap();
+                Ok((StatusCode::FOUND, url))
+            }
             DbError::HostIsNotUrl => Err(StatusCode::BAD_REQUEST),
             DbError::UrlIsNotUrl => Err(StatusCode::BAD_REQUEST),
             _ => Err(StatusCode::INTERNAL_SERVER_ERROR),
@@ -65,7 +68,7 @@ async fn get_url(
     State(db): State<Db>,
     Path(id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    let full_url_result = db.get_link(id).await;
+    let full_url_result = db.get_link(&id).await;
     match full_url_result {
         Ok(full_url) => Ok(Redirect::permanent(full_url.as_str())),
         Err(err) => match err {
