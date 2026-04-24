@@ -54,7 +54,7 @@ async fn short(
         Ok(url) => Ok((StatusCode::CREATED, url)),
         Err(err) => match err {
             DbError::AlreadyExists => {
-                let url = db.get_link(&full_url).await.unwrap();
+                let url = db.get_url_id(&host, &full_url).await.unwrap();
                 Ok((StatusCode::FOUND, url))
             }
             DbError::HostIsNotUrl => Err(StatusCode::BAD_REQUEST),

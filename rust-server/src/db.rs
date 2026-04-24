@@ -56,6 +56,18 @@ impl Db {
         }
     }
 
+    pub async fn get_url_id(&self, host: &String, full_url: &String) -> Result<String, DbError> {
+        let row = sqlx::query!("select url_id from urls where full_url = $1", full_url)
+            .fetch_one(&self.pool)
+            .await
+            .unwrap();
+        if let Some(url_id) = row.url_id {
+            Ok(format!("{}/{}", host, url_id))
+        } else {
+            Err(DbError::NoSuchLink)
+        }
+    }
+
     async fn generate_unique_url_id(&self) -> String {
         let mut url_id = Db::generate_url_id();
         while !self.check_url_id(&url_id).await.unwrap() {
