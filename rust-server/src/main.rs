@@ -17,7 +17,6 @@ use crate::db::{Db, DbError};
 #[tokio::main]
 async fn main() {
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let db_url_1 = env::var("DATABASE_URL1").expect("DATABASE_URL1 must be set");
     let db = Db::new(db_url).await.unwrap();
     let app = Router::new()
         .route("/short", post(short))
