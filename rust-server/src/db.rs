@@ -18,6 +18,8 @@ impl Db {
             .run(&pool)
             .await
             .map_err(|err| DbError::MigrateError(err.to_string()))?;
+
+        start_cleanup_task(&pool);
         Ok(Self { pool })
     }
 

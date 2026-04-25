@@ -1,3 +1,4 @@
+mod cleanup;
 mod db;
 
 use std::env;
