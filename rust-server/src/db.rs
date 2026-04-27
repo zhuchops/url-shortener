@@ -15,7 +15,7 @@ impl Db {
             .await
             .map_err(|err| DbError::NoSuchDatabase(err.to_string()))?;
 
-        sqlx::migrate!("./migrations")
+        sqlx::migrate!()
             .run(&pool)
             .await
             .map_err(|err| DbError::MigrateError(err.to_string()))?;
