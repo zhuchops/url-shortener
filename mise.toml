@@ -1,0 +1,3 @@
+[env]
+DATABASE_URL = "postgresql://deutscherburger:kidburg@localhost:5432/url-shortener"
+HOST_URL = "http://localhost:3000"

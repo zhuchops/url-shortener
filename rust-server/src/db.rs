@@ -1,3 +1,4 @@
+use crate::cleanup::start_cleanup_task;
 use chrono::{self, Utc};
 use rand::RngExt;
 use sqlx::PgPool;
@@ -14,12 +15,12 @@ impl Db {
             .await
             .map_err(|err| DbError::NoSuchDatabase(err.to_string()))?;
 
-        sqlx::migrate!()
+        sqlx::migrate!("./migrations")
             .run(&pool)
             .await
             .map_err(|err| DbError::MigrateError(err.to_string()))?;
 
-        start_cleanup_task(&pool);
+        start_cleanup_task(pool.clone());
         Ok(Self { pool })
     }
 
@@ -46,16 +47,15 @@ impl Db {
         Ok(format!("{}", url))
     }
 
-    pub async fn get_link(&self, url_id: &String) -> Result<String, DbError> {
-        let row = sqlx::query!("select full_url from urls where url_id = $1", url_id)
-            .fetch_one(&self.pool)
+    pub async fn get_link(&self, url_id: &str) -> Result<String, DbError> {
+        let full_url = sqlx::query!("select full_url from urls where url_id = $1", url_id)
+            .fetch_optional(&self.pool)
             .await
-            .unwrap();
-        if let Some(full_url) = row.full_url {
-            Ok(format!("{}", full_url))
-        } else {
-            Err(DbError::NoSuchLink)
-        }
+            .map_err(|err| DbError::NoSuchLink)?
+            .map(|row| row.full_url)
+            .ok_or(DbError::NoSuchLink)?
+            .ok_or(DbError::NoSuchLink)?;
+        Ok(format!("{}", full_url))
     }
 
     pub async fn get_url_id(&self, host: &String, full_url: &String) -> Result<String, DbError> {
