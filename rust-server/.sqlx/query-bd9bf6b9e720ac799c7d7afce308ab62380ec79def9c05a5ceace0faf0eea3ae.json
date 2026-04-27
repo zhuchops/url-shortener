@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "delete from urls where date < NOW() - INTERVAL '1 month'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "bd9bf6b9e720ac799c7d7afce308ab62380ec79def9c05a5ceace0faf0eea3ae"
+}
