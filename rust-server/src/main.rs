@@ -12,6 +12,7 @@ use axum::{
 };
 
 use serde::Deserialize;
+use tower_http::cors::{Any, CorsLayer};
 
 use crate::db::{Db, DbError};
 
@@ -25,7 +26,13 @@ async fn main() {
         .route("/{id}", get(get_url))
         .with_state(db)
         .route("/", get(root))
-        .route("/health", get(health));
+        .route("/health", get(health))
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any)
+        );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     _ = axum::serve(listener, app).await;
