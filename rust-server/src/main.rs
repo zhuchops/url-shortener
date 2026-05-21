@@ -21,8 +21,8 @@ async fn main() {
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let db = Db::new(db_url).await.unwrap();
     let app = Router::new()
-        .route("/short", post(short))
-        .route("/get/{id}", get(get_url))
+        .route("api/short", post(short))
+        .route("api/get/{id}", get(get_url))
         .route("/{id}", get(get_url))
         .with_state(db)
         .route("/", get(root))

@@ -7,7 +7,7 @@ COPY rust-server/Cargo.toml rust-server/Cargo.lock ./
 
 RUN mkdir src && echo "fn main() {}" > src/main.rs
 RUN cargo build --release
-RUN rm -f target/release/deps/rust_server*
+RUN rm -rf target/release/deps/rust_server*
 
 COPY rust-server/src ./src
 COPY rust-server/migrations ./migrations
